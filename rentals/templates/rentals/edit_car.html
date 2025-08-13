@@ -1,0 +1,30 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8" />
+    <title>Επεξεργασία Οχήματος</title>
+    <link rel="stylesheet" href="{% static 'rentals/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>✏️ Επεξεργασία Οχήματος</h1>
+
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li class="{{ message.tags }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Αποθήκευση</button>
+            <a class="btn" href="{% url 'rentals:select_car' %}" style="margin-left:8px;">Άκυρο</a>
+        </form>
+    </div>
+</body>
+</html>

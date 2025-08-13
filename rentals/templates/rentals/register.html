@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <title>Εγγραφή Εταιρίας</title>
+</head>
+<body>
+    <h1>Εγγραφή Εταιρίας</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Εγγραφή</button>
+    </form>
+</body>
+</html>

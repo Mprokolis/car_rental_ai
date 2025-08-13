@@ -1,0 +1,187 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <title>Επιλογή Αυτοκινήτου</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'rentals/style.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        .settings-container { position: absolute; top: 20px; right: 20px; }
+        .settings-button {
+            background-color: var(--logout-bg); color: var(--button-text);
+            border: none; padding: 0.5rem 0.8rem; border-radius: 8px;
+            cursor: pointer; font-size: 1rem;
+        }
+        .settings-button:hover { background-color: var(--logout-hover); }
+        .settings-menu {
+            display: none; position: absolute; top: 50px; right: 0;
+            background-color: var(--container-bg); border: 1px solid var(--card-border);
+            border-radius: 8px; padding: 0.8rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 999;
+        }
+        .settings-menu.show { display: block; }
+        .settings-menu button { display: block; width: 100%; margin-bottom: 0.5rem; }
+        .car-list li { cursor: pointer; }
+        .car-list li .meta { opacity: .85; }
+        .nav-actions { margin: 0.8rem 0 1.2rem; display:flex; gap:.6rem; flex-wrap:wrap; align-items:center; }
+        .btn { padding:.45rem .8rem; border-radius:8px; text-decoration:none; display:inline-block; }
+        .btn.primary { background: var(--btn-bg, #2563eb); color: var(--btn-text, #fff); }
+        .btn.secondary { background: var(--container-bg); border:1px solid var(--card-border); color: inherit; }
+
+        /* ➕ Προσθήκη: συνοπτικά counts στο κέντρο */
+        .counts-summary{
+            text-align:center; font-weight:600; margin:.6rem 0 1rem;
+        }
+        .counts-summary .dot{ margin:0 .6rem; color:#999; }
+    </style>
+</head>
+<body>
+    <!-- ⚙️ Ρυθμίσεις -->
+    <div class="settings-container">
+        <button class="settings-button" onclick="toggleSettingsMenu()">⚙️ Ρυθμίσεις</button>
+        <div class="settings-menu" id="settingsMenu">
+            <form action="{% url 'rentals:logout_company' %}" method="post">
+                {% csrf_token %}
+                <button type="submit"><i class="fas fa-sign-out-alt"></i> Αποσύνδεση</button>
+            </form>
+            <button onclick="toggleTheme()">🌓 Εναλλαγή Θέματος</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1><i class="fas fa-car"></i> Επιλογή Αυτοκινήτου</h1>
+
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li class="{{ message.tags }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <form method="get">
+            {{ form.as_p }}
+            <button type="submit"><i class="fas fa-search"></i> Αναζήτηση</button>
+        </form>
+
+        <!-- 🔗 Πλοήγηση -->
+        <div class="nav-actions">
+            <a class="btn primary" href="{% url 'rentals:bookings_list' %}">
+                <i class="fas fa-calendar-check"></i> Διαχείριση Κρατήσεων
+            </a>
+            <a class="btn secondary" href="{% url 'rentals:add_car' %}">
+                <i class="fas fa-plus-circle"></i> Προσθήκη Οχήματος
+            </a>
+            <a class="btn secondary" href="{% url 'rentals:delete_cars' %}">
+                <i class="fas fa-trash"></i> Διαγραφή Οχημάτων
+            </a>
+        </div>
+
+        <!-- ✅ Προσθήκη: Μετρητές πάνω από "Διαθέσιμα Αυτοκίνητα" -->
+        <div class="counts-summary">
+            Διαθέσιμα: <strong>{{ available_cars|length }}</strong>
+            <span class="dot">•</span>
+            Νοικιασμένα: <strong>{{ rented_cars|length }}</strong>
+        </div>
+
+        <!-- 🚗 Διαθέσιμα -->
+        <div class="columns">
+            <div class="column">
+                <h2><i class="fas fa-car-side"></i> Διαθέσιμα Αυτοκίνητα</h2>
+                {% if available_cars %}
+                    <ul class="car-list">
+                        {% for car in available_cars %}
+                        <li class="car-row"
+                            data-edit-url="{% url 'rentals:edit_car' car.id %}"
+                            title="Διπλό κλικ για επεξεργασία">
+                            <span class="rank">#{{ forloop.counter }}</span>
+                            <span class="meta">
+                                {{ car.brand }} {{ car.model }} — <strong>{{ car.license_plate|default:"—" }}</strong>
+                                ({{ car.category }}, {{ car.fuel_type }})
+                            </span>
+                            {% if request_id %}
+                                <a class="btn" href="{% url 'rentals:choose_car' request_id car.id %}"
+                                   onclick="event.stopPropagation();">
+                                    <i class="fas fa-check-circle"></i> Επιλογή
+                                </a>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>Δεν υπάρχουν διαθέσιμα οχήματα.</p>
+                {% endif %}
+            </div>
+
+            <!-- 📄 Νοικιασμένα -->
+            <div class="column">
+                <h2><i class="fas fa-file-contract"></i> Νοικιασμένα Αυτοκίνητα</h2>
+                {% if rented_cars %}
+                    <ul class="car-list">
+                        {% for car in rented_cars %}
+                        <li class="car-row"
+                            data-edit-url="{% url 'rentals:edit_car' car.id %}"
+                            title="Διπλό κλικ για επεξεργασία">
+                            <span class="meta">
+                                {{ car.brand }} {{ car.model }} — <strong>{{ car.license_plate|default:"—" }}</strong>
+                                ({{ car.category }}, {{ car.fuel_type }})
+                            </span>
+                            {% if car.company.user == request.user %}
+                                <a class="btn" href="{% url 'rentals:return_car' car.id %}"
+                                   onclick="event.stopPropagation();">
+                                    <i class="fas fa-undo"></i> Επιστροφή
+                                </a>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>Δεν υπάρχουν νοικιασμένα οχήματα.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+    // DD-MM-YYYY για datepickers
+    flatpickr(".datepicker", { dateFormat: "d-m-Y" });
+
+    // Double-click για επεξεργασία
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".car-row").forEach(function (row) {
+            row.addEventListener("dblclick", function (e) {
+                if (e.target.closest("a, button")) return;
+                const url = row.dataset.editUrl;
+                if (url) window.location.href = url;
+            });
+        });
+    });
+
+    function toggleTheme() {
+        const body = document.body;
+        const isDark = body.classList.toggle("dark");
+        document.cookie = `theme=${isDark ? 'dark' : 'light'};path=/;max-age=31536000`;
+    }
+    function toggleSettingsMenu() {
+        const menu = document.getElementById("settingsMenu");
+        menu.classList.toggle("show");
+    }
+    window.addEventListener("click", function(event) {
+        const menu = document.getElementById("settingsMenu");
+        if (!event.target.closest('.settings-container')) {
+            menu.classList.remove('show');
+        }
+    });
+    (function () {
+        const themeCookie = document.cookie.split('; ').find(r => r.startsWith('theme='));
+        if (themeCookie && themeCookie.split('=')[1] === 'dark') {
+            document.body.classList.add('dark');
+        }
+    })();
+    </script>
+</body>
+</html>

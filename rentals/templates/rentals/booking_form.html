@@ -1,0 +1,30 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <title>Νέα Κράτηση</title>
+  <link rel="stylesheet" href="{% static 'rentals/style.css' %}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Νέα Κράτηση</h1>
+
+    <form method="post" class="card" style="padding:1rem;">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <div style="margin-top:1rem;">
+        <button class="btn" type="submit">Αποθήκευση</button>
+        <a class="btn btn-secondary" href="{% url 'rentals:bookings_list' %}">Ακύρωση</a>
+      </div>
+    </form>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script>
+    // DD-MM-YYYY και στα πεδία των κρατήσεων
+    flatpickr(".datepicker", { dateFormat: "d-m-Y" });
+  </script>
+</body>
+</html>

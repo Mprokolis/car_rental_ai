@@ -1,0 +1,39 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <title>Σύνδεση</title>
+  <link rel="stylesheet" href="{% static 'rentals/style.css' %}">
+  <style>
+    .auth-card{max-width:420px;margin:5rem auto;background:var(--container-bg);padding:1.2rem;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.08)}
+    .auth-actions{display:flex;gap:.5rem;justify-content:space-between;align-items:center;margin-top:.8rem}
+    .muted{opacity:.8;font-size:.9rem}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="auth-card">
+      <h1>Φόρμα Σύνδεσης</h1>
+
+      {% if messages %}
+        <ul class="messages">
+          {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      <form method="post" action="{% url 'rentals:login_company' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="auth-actions">
+          <button class="btn" type="submit">Σύνδεση</button>
+          <!-- Αν θέλουμε αργότερα password reset, θα προσθέσουμε σωστό route -->
+          <span class="muted">Δεν έχεις λογαριασμό; <a href="{% url 'rentals:register_company' %}">Εγγραφή</a></span>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

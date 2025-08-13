@@ -1,0 +1,115 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8" />
+  <title>Κρατήσεις</title>
+  <link rel="stylesheet" href="{% static 'rentals/style.css' %}">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    .toolbar{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem}
+    .btn{padding:.55rem .9rem;border:1px solid #ddd;border-radius:.5rem;cursor:pointer;background:#111;color:#fff}
+    .btn.light{background:#fff;color:#111}
+    .btn.danger{background:#b00020;color:#fff;border-color:#9a001c}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:.5rem;border-bottom:1px solid #eee;text-align:left;vertical-align:middle}
+    .status{padding:.2rem .5rem;border-radius:.4rem;font-size:.85rem}
+    .status.imported{background:#f0f4ff}
+    .status.active{background:#fff7e6}
+    .status.completed{background:#e9fbe9}
+    .status.cancelled{background:#fdeaea}
+    .muted{color:#666}
+    .select-col{width:44px;text-align:center}
+    input[type="checkbox"]{transform:scale(1.2)}
+  </style>
+</head>
+<body>
+
+  <!-- Επάνω actions -->
+  <div class="toolbar">
+    <a class="btn light" href="{% url 'rentals:home' %}">← Πίσω στην αρχική</a>
+    <a class="btn light" href="{% url 'rentals:booking_create' %}">➕ Νέα κράτηση (manual)</a>
+  </div>
+
+  <!-- Φίλτρα (GET) -->
+  <form method="get" class="toolbar">
+    {{ filter_form.status }}
+    Από: {{ filter_form.start_from }}
+    Έως: {{ filter_form.end_to }}
+    <button class="btn light" type="submit">Φίλτρο</button>
+  </form>
+
+  <!-- Μαζική διαγραφή (POST) -->
+  <form method="post" id="bulk-delete-form" onsubmit="return confirm('Να διαγραφούν οι επιλεγμένες κρατήσεις;');">
+    {% csrf_token %}
+
+    <div class="toolbar" style="justify-content:flex-end">
+      <button class="btn danger" type="submit" name="action" value="delete_selected">🗑️ Διαγραφή επιλεγμένων</button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Πελάτης</th>
+          <th>Όχημα</th>
+          <th>Ημ/νίες</th>
+          <th>Ποσό</th>
+          <th>Status</th>
+          <th>Ενέργειες</th>
+          <th class="select-col">
+            <input type="checkbox" id="select-all" title="Επιλογή όλων">
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for b in bookings %}
+        <tr>
+          <td>{{ b.id }}</td>
+          <td>{{ b.customer_name }}<div class="muted">{{ b.customer_phone }}</div></td>
+          <td>{{ b.car.brand }} {{ b.car.model }}</td>
+          <td>{{ b.start_date }} → {{ b.end_date }}</td>
+          <td>{{ b.total_price }} €</td>
+          <td>
+            <span class="status {{ b.status }}">
+              {% if b.status == 'imported' %}Εισαγόμενη{% endif %}
+              {% if b.status == 'active' %}Σε εξέλιξη{% endif %}
+              {% if b.status == 'completed' %}Ολοκληρώθηκε{% endif %}
+              {% if b.status == 'cancelled' %}Ακυρώθηκε{% endif %}
+            </span>
+          </td>
+          <td>
+            {% if b.status == 'imported' %}
+              <a class="btn light" href="{% url 'rentals:booking_start' b.id %}">Start</a>
+              <a class="btn light" href="{% url 'rentals:booking_cancel' b.id %}">Cancel</a>
+            {% elif b.status == 'active' %}
+              <a class="btn light" href="{% url 'rentals:booking_complete' b.id %}">Complete</a>
+              <a class="btn light" href="{% url 'rentals:booking_cancel' b.id %}">Cancel</a>
+            {% else %}
+              —
+            {% endif %}
+          </td>
+          <td class="select-col">
+            <input type="checkbox" name="selected_bookings" value="{{ b.id }}" class="row-check">
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="8" class="muted">Δεν υπάρχουν κρατήσεις.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </form>
+
+  <script>
+    // select-all
+    const selectAll = document.getElementById('select-all');
+    const checks = document.querySelectorAll('.row-check');
+    if (selectAll) {
+      selectAll.addEventListener('change', e => {
+        checks.forEach(ch => ch.checked = e.target.checked);
+      });
+    }
+  </script>
+
+</body>
+</html>

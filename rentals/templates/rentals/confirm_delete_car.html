@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <title>Επιβεβαίωση Διαγραφής</title>
+</head>
+<body>
+    <h2>Επιβεβαίωση Διαγραφής</h2>
+    <p>Είστε σίγουροι ότι θέλετε να διαγράψετε το όχημα: <strong>{{ car.brand }} {{ car.model }}</strong>;</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">✅ Ναι, Διαγραφή</button>
+        <a href="{% url 'rentals:select_car' %}">❌ Όχι, επιστροφή</a>
+    </form>
+</body>
+</html>

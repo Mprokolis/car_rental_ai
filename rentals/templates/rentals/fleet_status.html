@@ -1,0 +1,57 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <title>Στόλος Οχημάτων</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'rentals/style.css' %}">
+</head>
+<body>
+<div class="container">
+    <h1><i class="fas fa-car"></i> Στόλος Οχημάτων</h1>
+
+    <h2><i class="fas fa-car-side"></i> Διαθέσιμα Οχήματα</h2>
+    {% if available_cars %}
+    <div class="car-grid">
+        {% for car in available_cars %}
+        <div class="car-card">
+            <h3>{{ car.brand }} {{ car.model }}</h3>
+            <ul>
+                <li><strong>Κατηγορία:</strong> {{ car.category }}</li>
+                <li><strong>Καύσιμο:</strong> {{ car.fuel_type }}</li>
+            </ul>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+        <p>Κανένα διαθέσιμο όχημα.</p>
+    {% endif %}
+
+    <h2><i class="fas fa-file-contract"></i> Νοικιασμένα Οχήματα</h2>
+    {% if rented_cars %}
+    <div class="car-grid">
+        {% for car in rented_cars %}
+        <div class="car-card rented">
+            <h3>{{ car.brand }} {{ car.model }}</h3>
+            <ul>
+                <li><strong>Κατηγορία:</strong> {{ car.category }}</li>
+                <li><strong>Καύσιμο:</strong> {{ car.fuel_type }}</li>
+            </ul>
+            <p class="status"><i class="fas fa-lock"></i> Νοικιασμένο</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+        <p>Κανένα ενεργό συμβόλαιο.</p>
+    {% endif %}
+
+    <p class="back-link">
+        <a href="{% url 'rentals:select_car' %}">
+            <i class="fas fa-arrow-left"></i> Επιστροφή στην Επιλογή Αυτοκινήτου
+        </a>
+    </p>
+</div>
+</body>
+</html>

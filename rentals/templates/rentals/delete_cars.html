@@ -1,0 +1,114 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <title>Διαγραφή Οχημάτων</title>
+    <link rel="stylesheet" href="{% static 'rentals/style.css' %}">
+    <style>
+        .delete-page {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #c0392b;
+            margin-bottom: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+        }
+
+        th, td {
+            padding: 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .btn-delete {
+            background-color: #e74c3c;
+            padding: 0.6rem 1.4rem;
+            border: none;
+            color: white;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-delete:hover {
+            background-color: #c0392b;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .back-link a {
+            color: #2c3e50;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div class="delete-page">
+    <h1>🗑️ Μαζική Διαγραφή Οχημάτων</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {% if cars %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Επιλογή</th>
+                    <th>Μάρκα</th>
+                    <th>Μοντέλο</th>
+                    <th>Κατηγορία</th>
+                    <th>Καύσιμο</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for car in cars %}
+                <tr>
+                    <td><input type="checkbox" name="selected_cars" value="{{ car.id }}"></td>
+                    <td>{{ car.brand }}</td>
+                    <td>{{ car.model }}</td>
+                    <td>{{ car.category }}</td>
+                    <td>{{ car.fuel_type }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div style="text-align: center;">
+            <button type="submit" class="btn-delete">Διαγραφή Επιλεγμένων</button>
+        </div>
+        {% else %}
+            <p style="text-align:center;">Δεν υπάρχουν διαθέσιμα οχήματα για διαγραφή.</p>
+        {% endif %}
+    </form>
+
+    <div class="back-link">
+        <a href="{% url 'rentals:select_car' %}">← Επιστροφή</a>
+    </div>
+</div>
+</body>
+</html>
