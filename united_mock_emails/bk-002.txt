@@ -1,8 +1,0 @@
-United Booking #U-2025-0002
-Customer: Nikos Frag
-Phone: +30 6900000000
-Start: 15-08-2025
-End: 20-08-2025
-Category: small
-Extra Insurance: No
-Total: 180.00

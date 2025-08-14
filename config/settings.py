@@ -30,9 +30,6 @@ INSTALLED_APPS = [
     'recommendations',
 ]
 
-# ➕ Προσθήκη integrations (μία φορά)
-if "integrations" not in INSTALLED_APPS:
-    INSTALLED_APPS = list(INSTALLED_APPS) + ["integrations"]
 
 # 🛡️ Middleware
 MIDDLEWARE = [
@@ -111,43 +108,6 @@ EMAIL_FAIL_SILENTLY = True
 
 # 🗝️ Default primary key
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# ========== United / Outlook Integration Settings ==========
-
-# Mock mode: δουλεύει ΧΩΡΙΣ Outlook (διαβάζει .txt/.pdf από φάκελο)
-UNITED_USE_MOCK = os.getenv("UNITED_USE_MOCK", "true").lower() == "true"
-# Φάκελος με mock emails (δίπλα στο manage.py)
-UNITED_MOCK_DIR = os.getenv("UNITED_MOCK_DIR", "united_mock_emails")
-# Η εταιρεία στο δικό σου σύστημα που θα "χρεώνεται" τις κρατήσεις της United (Company.email)
-UNITED_TARGET_COMPANY_EMAIL = os.getenv("UNITED_TARGET_COMPANY_EMAIL", "")
-# Προαιρετικό φίλτρο subject
-UNITED_SUBJECT_KEYWORD = os.getenv("UNITED_SUBJECT_KEYWORD", "United Booking")
-
-# ---- Microsoft Graph: ΟΝΟΜΑΤΑ ΠΟΥ ΧΡΗΣΙΜΟΠΟΙΟΥΝ ΟΙ VIEWS ----
-# Μπορείς να τα θέσεις από .env
-MS_GRAPH_TENANT = os.getenv("MS_GRAPH_TENANT", "common")  # ή Tenant ID (π.χ. 'xxxxxxxx-xxxx-...')
-MS_GRAPH_CLIENT_ID = os.getenv("MS_GRAPH_CLIENT_ID", os.getenv("GRAPH_CLIENT_ID", ""))
-MS_GRAPH_CLIENT_SECRET = os.getenv("MS_GRAPH_CLIENT_SECRET", os.getenv("GRAPH_CLIENT_SECRET", ""))
-MS_GRAPH_REDIRECT_URI = os.getenv(
-    "MS_GRAPH_REDIRECT_URI",
-    "http://localhost:8000/integrations/outlook/callback/"
-)
-# Scopes για delegated flow
-MS_GRAPH_SCOPES = ["offline_access", "Mail.Read"]
-
-# Προαιρετικά φίλτρα ανάγνωσης inbox
-OUTLOOK_FILTER_FROM = os.getenv("OUTLOOK_FILTER_FROM", "")  # π.χ. 'reservations@united.com'
-OUTLOOK_FOLDER = os.getenv("OUTLOOK_FOLDER", "Inbox")
-
-# Προσωρινός φάκελος για αποθήκευση PDF που έρχονται από email
-IMPORT_TMP_DIR = os.path.join(BASE_DIR, "tmp_imports")
-os.makedirs(IMPORT_TMP_DIR, exist_ok=True)
-
-# ---- Παλαιά ονόματα (back-compat με παλιές ρυθμίσεις σου) ----
-GRAPH_TENANT_ID = os.getenv("GRAPH_TENANT_ID", "")
-GRAPH_CLIENT_ID = os.getenv("GRAPH_CLIENT_ID", MS_GRAPH_CLIENT_ID)
-GRAPH_CLIENT_SECRET = os.getenv("GRAPH_CLIENT_SECRET", MS_GRAPH_CLIENT_SECRET)
-GRAPH_USER_ID = os.getenv("GRAPH_USER_ID", "")  # mailbox email ή user id (δεν απαιτείται στο delegated)
 
 # Για να μην μπλοκάρει ο Django σε τοπικά δίκτυα/ονόματα όταν κάνεις demo
 ALLOWED_HOSTS = list(set(list(ALLOWED_HOSTS) + ["127.0.0.1", "localhost"]))
