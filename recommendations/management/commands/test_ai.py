@@ -30,7 +30,7 @@ class Command(BaseCommand):
             return
 
         try:
-            model, category_encoder, fuel_encoder = joblib.load(model_path)
+            model, category_encoder = joblib.load(model_path)
         except:
             self.stdout.write(self.style.ERROR("❌ Σφάλμα κατά το φόρτωμα του μοντέλου."))
             return
@@ -53,7 +53,6 @@ class Command(BaseCommand):
 
             try:
                 cat_encoded = category_encoder.transform([req.requested_category])[0]
-                fuel_encoded = fuel_encoder.transform([[car.fuel_type]])[0]
             except:
                 continue
 
@@ -62,9 +61,6 @@ class Command(BaseCommand):
                 float(req.total_price),
                 int(req.extra_insurance),
                 cat_encoded,
-                float(car.price_per_day or 0),
-                int(car.extra_insurance),
-                *fuel_encoded
             ]
 
             # ✅ Δημιουργία DataFrame με ονόματα στηλών
@@ -73,9 +69,6 @@ class Command(BaseCommand):
                 "total_price",
                 "extra_insurance",
                 "requested_category_enc",
-                "car_price_per_day",
-                "car_extra_insurance",
-                *fuel_encoder.get_feature_names_out(["car_fuel_type"])
             ]
             input_df = pd.DataFrame([features], columns=feature_names)
 

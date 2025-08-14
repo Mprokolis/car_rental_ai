@@ -1,10 +1,10 @@
 import pandas as pd
 import joblib
 from django.contrib.auth.models import User
-from rentals.models import Company, Car
+from rentals.models import Company
 from recommendations.models import RentalRequest, RentalDecision
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.preprocessing import LabelEncoder, OneHotEncoder
+from sklearn.preprocessing import LabelEncoder
 
 
 def build_training_dataset(company_username):
@@ -26,10 +26,7 @@ def build_training_dataset(company_username):
             "total_price": float(req.total_price),
             "extra_insurance": int(req.extra_insurance),
             "requested_category": req.requested_category,
-            "car_price_per_day": float(car.price_per_day or 0),
-            "car_extra_insurance": int(car.extra_insurance),
-            "car_fuel_type": car.fuel_type,
-            "car_id": car.id
+            "car_id": car.id,
         })
 
     df = pd.DataFrame(rows)
@@ -43,25 +40,15 @@ def build_training_dataset(company_username):
 
 def train_model(df):
     category_encoder = LabelEncoder()
-    df["requested_category_enc"] = category_encoder.fit_transform(df["requested_category"])
-
-    fuel_encoder = OneHotEncoder(sparse_output=False)
-    fuel_encoded = fuel_encoder.fit_transform(df[["car_fuel_type"]])
-    fuel_df = pd.DataFrame(
-        fuel_encoded,
-        columns=fuel_encoder.get_feature_names_out(["car_fuel_type"])
+    df["requested_category_enc"] = category_encoder.fit_transform(
+        df["requested_category"]
     )
-
-    df = pd.concat([df.reset_index(drop=True), fuel_df.reset_index(drop=True)], axis=1)
 
     X = df[[
         "days",
         "total_price",
         "extra_insurance",
         "requested_category_enc",
-        "car_price_per_day",
-        "car_extra_insurance",
-        *fuel_df.columns
     ]]
     y = df["car_id"]
 
@@ -70,10 +57,10 @@ def train_model(df):
     model.fit(X, y)
     print("✅ Training complete.")
 
-    return model, category_encoder, fuel_encoder
+    return model, category_encoder
 
 
-def save_model(model, category_encoder, fuel_encoder, company_id):
+def save_model(model, category_encoder, company_id):
     filename = f"model_company_{company_id}.joblib"
-    joblib.dump((model, category_encoder, fuel_encoder), filename)
+    joblib.dump((model, category_encoder), filename)
     print(f"💾 Model saved to {filename}")
