@@ -29,8 +29,10 @@
         {{ form.as_p }}
         <div class="auth-actions">
           <button class="btn" type="submit">Σύνδεση</button>
-          <!-- Αν θέλουμε αργότερα password reset, θα προσθέσουμε σωστό route -->
-          <span class="muted">Δεν έχεις λογαριασμό; <a href="{% url 'rentals:register_company' %}">Εγγραφή</a></span>
+          <span class="muted">
+            <a href="{% url 'rentals:password_reset' %}">Ξέχασες τον κωδικό;</a><br>
+            Δεν έχεις λογαριασμό; <a href="{% url 'rentals:register_company' %}">Εγγραφή</a>
+          </span>
         </div>
       </form>
     </div>
