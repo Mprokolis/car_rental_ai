@@ -1,8 +1,0 @@
-United Booking #U-2025-0003
-Customer: Giannis Papageorgiou
-Phone: +30 6987654321
-Start: 18-08-2025
-End: 25-08-2025
-Category: suv
-Extra Insurance: Yes
-Total: 560.50
