@@ -26,10 +26,10 @@ class Command(BaseCommand):
             return
 
         self.stdout.write("🧠 Εκπαίδευση μοντέλου...")
-        model, category_encoder, fuel_encoder = train_model(df)
+        model, category_encoder = train_model(df)
 
         self.stdout.write("💾 Αποθήκευση μοντέλου...")
-        save_model(model, category_encoder, fuel_encoder, company.id)
+        save_model(model, category_encoder, company.id)
 
         self.stdout.write(self.style.SUCCESS(
             f"✅ Το μοντέλο εκπαιδεύτηκε και αποθηκεύτηκε ως model_company_{company.id}.joblib"

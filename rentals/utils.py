@@ -19,7 +19,7 @@ def rank_cars(request_filters, qs, company_id):
         return default_ranking(request_filters, qs)
 
     try:
-        model, category_encoder, fuel_encoder = joblib.load(model_path)
+        model, category_encoder = joblib.load(model_path)
     except Exception:
         return default_ranking(request_filters, qs)
 
@@ -28,35 +28,22 @@ def rank_cars(request_filters, qs, company_id):
 
     category_encoded = category_encoder.transform([wanted_category])[0]
     scores = {}
+    input_features = [
+        days,
+        total_price,
+        extra_insurance,
+        category_encoded,
+    ]
 
-    for car in target_cars:
-        car_price = float(car.price_per_day or 0)
-        car_insurance = 1 if car.extra_insurance else 0
-        fuel_type = car.fuel_type
-
-        try:
-            fuel_encoded = fuel_encoder.transform([[fuel_type]])[0]
-        except:
-            fuel_encoded = [0] * len(fuel_encoder.get_feature_names_out(["car_fuel_type"]))
-
-        input_features = [
-            days,
-            total_price,
-            extra_insurance,
-            category_encoded,
-            car_price,
-            car_insurance,
-            *fuel_encoded
-        ]
-
-        try:
-            probas = model.predict_proba([input_features])[0]
-            class_ids = model.classes_.tolist()
+    try:
+        probas = model.predict_proba([input_features])[0]
+        class_ids = model.classes_.tolist()
+        for car in target_cars:
             prob = probas[class_ids.index(car.id)] if car.id in class_ids else 0.0
-        except:
-            prob = 0.0
-
-        scores[car] = prob
+            scores[car] = prob
+    except:
+        for car in target_cars:
+            scores[car] = 0.0
 
     sorted_target = sorted(scores.items(), key=lambda x: x[1], reverse=True)
     sorted_target = [car for car, _ in sorted_target]

@@ -15,7 +15,7 @@ def test_model_accuracy(company_username):
 
     model_path = f"model_company_{company.id}.joblib"
     try:
-        model, category_encoder, fuel_encoder = joblib.load(model_path)
+        model, category_encoder = joblib.load(model_path)
     except:
         print(f"❌ Δεν βρέθηκε ή δεν φορτώθηκε το μοντέλο για την εταιρεία '{company.name}'.")
         return
@@ -34,7 +34,6 @@ def test_model_accuracy(company_username):
 
         try:
             cat_encoded = category_encoder.transform([req.requested_category])[0]
-            fuel_encoded = fuel_encoder.transform([[car.fuel_type]])[0]
         except:
             continue
 
@@ -43,9 +42,6 @@ def test_model_accuracy(company_username):
             float(req.total_price),
             int(req.extra_insurance),
             cat_encoded,
-            float(car.price_per_day or 0),
-            int(car.extra_insurance),
-            *fuel_encoded
         ]
 
         try:
