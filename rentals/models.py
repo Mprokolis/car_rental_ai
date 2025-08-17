@@ -1,6 +1,7 @@
+"""Database models for the rentals app."""
+
 from django.db import models
 from django.contrib.auth.models import User
-from datetime import timedelta
 
 class Company(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -99,12 +100,14 @@ class Booking(models.Model):
     chosen_car = models.ForeignKey('Car', null=True, blank=True, on_delete=models.SET_NULL)
 
     def __str__(self):
-        return f"Booking #{self.id} ({self.status})"
+        code = self.booking_code or f"G5{self.id}" if self.id else "unsaved"
+        return f"{code} – {self.customer_name}" if self.customer_name else code
 
     def save(self, *args, **kwargs):
-        creating = self.pk is None
+        """Persist the booking and generate a code on first save."""
+        is_new = self.pk is None
         super().save(*args, **kwargs)
-        if creating and not self.booking_code:
+        if is_new and not self.booking_code:
             self.booking_code = f"G5{self.id}"
             super().save(update_fields=["booking_code"])
 
