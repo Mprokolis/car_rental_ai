@@ -76,8 +76,8 @@
           <td>{{ b.booking_code }}</td>
           <td>{{ b.customer_name }}</td>
           <td>{{ b.requested_category }}</td>
-          <td>{% if b.start_date %}{{ b.start_date|date:"d-m-Y H:i" }}{% endif %}</td>
-          <td>{% if b.end_date %}{{ b.end_date|date:"d-m-Y H:i" }}{% endif %}</td>
+          <td>{% if b.start_date %}{{ b.start_date|date:"d-m-Y" }}{% endif %}</td>
+          <td>{% if b.end_date %}{{ b.end_date|date:"d-m-Y" }}{% endif %}</td>
           <td>{{ b.days }}</td>
           <td>{% if b.total_price %}€{{ b.total_price }}{% endif %}</td>
           <td>
