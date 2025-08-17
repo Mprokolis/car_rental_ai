@@ -9,11 +9,11 @@
     .wrap { max-width: 1100px; margin: 2rem auto; }
     .topbar { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:1rem; }
     .btn { padding:.5rem .8rem; border-radius:8px; border:1px solid var(--card-border,#e5e7eb); background:var(--container-bg,#fff); cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:.4rem; }
-    .btn.primary { background:#2563eb; color:#fff; border-color:#2563eb; }
-    .btn.danger { background:#fee2e2; border-color:#fecaca; }
-    .btn.success { background:#dcfce7; border-color:#bbf7d0; }
-    .btn.warn { background:#fde68a; border-color:#fcd34d; }
     .btn.small { padding:.35rem .6rem; font-size:.9rem; }
+    .btn.primary { background:#2563eb; color:#fff; border-color:#2563eb; }
+    .btn.success { background:#dcfce7; border-color:#bbf7d0; }
+    .btn.danger { background:#fee2e2; border-color:#fecaca; }
+    .btn.warn { background:#fde68a; border-color:#fcd34d; }
     .filters { display:flex; align-items:center; gap:.5rem; }
     table { width:100%; border-collapse: collapse; border-radius:12px; overflow:hidden; }
     thead th { background:#f3f4f6; text-align:left; padding:.7rem .6rem; font-weight:600; }
@@ -24,8 +24,6 @@
     .b-active { background:#dcfce7; }
     .b-completed { background:#e5e7eb; }
     .b-cancelled { background:#fee2e2; }
-    .msgs { margin:.5rem 0 1rem; }
-    .msgs li { list-style:none; padding:.4rem .6rem; margin:.2rem 0; border-radius:6px; background:#eef2ff; }
     .empty { padding:1rem; text-align:center; color:#666; }
   </style>
 </head>
@@ -48,18 +46,11 @@
       </div>
     </div>
 
-    {% if messages %}
-      <ul class="msgs">
-        {% for message in messages %}
-          <li class="{{ message.tags }}">{{ message }}</li>
-        {% endfor %}
-      </ul>
-    {% endif %}
-
     <table>
       <thead>
         <tr>
-          <th>Κωδικός</th>
+          <th>#</th>
+          <th>Δημιουργήθηκε</th>
           <th>Πελάτης</th>
           <th>Κατηγορία</th>
           <th>Από</th>
@@ -73,16 +64,25 @@
       <tbody>
         {% for b in bookings %}
         <tr>
+<<<<<<< HEAD
           <td>{{ b.booking_code }}</td>
           <td>{{ b.customer_name }}</td>
           <td>{{ b.requested_category }}</td>
           <td>{% if b.start_date %}{{ b.start_date|date:"d-m-Y" }}{% endif %}</td>
           <td>{% if b.end_date %}{{ b.end_date|date:"d-m-Y" }}{% endif %}</td>
+=======
+          <td>{{ b.id }}</td>
+          <!-- created_at είναι DateTimeField: επιτρέπεται H:i -->
+          <td>{{ b.created_at|date:"d-m-Y H:i" }}</td>
+          <td>{{ b.customer_name|default:"—" }}</td>
+          <td>{{ b.requested_category|default:"—" }}</td>
+          <!-- start_date/end_date είναι DateField: ΜΟΝΟ ημερομηνία -->
+          <td>{% if b.start_date %}{{ b.start_date|date:"d-m-Y" }}{% else %}—{% endif %}</td>
+          <td>{% if b.end_date %}{{ b.end_date|date:"d-m-Y" }}{% else %}—{% endif %}</td>
+>>>>>>> 3c73f0a (✨ Προσθήκη σελίδας Bookings με κουμπιά ενεργειών και βελτιώσεις UI)
           <td>{{ b.days }}</td>
-          <td>{% if b.total_price %}€{{ b.total_price }}{% endif %}</td>
-          <td>
-            <span class="badge b-{{ b.status }}">{{ b.status }}</span>
-          </td>
+          <td>{% if b.total_price %}€{{ b.total_price }}{% else %}—{% endif %}</td>
+          <td><span class="badge b-{{ b.status }}">{{ b.status }}</span></td>
           <td>
             <div class="actions">
               {% if b.status != 'active' and b.status != 'completed' %}
@@ -92,7 +92,6 @@
                 <button class="btn small" title="Σήμανση ως active">Ενεργοποίηση</button>
               </form>
               {% endif %}
-
               {% if b.status != 'completed' %}
               <form method="post" action="{% url 'rentals:booking_set_status' b.id 'complete' %}">
                 {% csrf_token %}
@@ -100,7 +99,6 @@
                 <button class="btn small success" title="Σήμανση ως completed">Ολοκλήρωση</button>
               </form>
               {% endif %}
-
               {% if b.status != 'cancelled' and b.status != 'completed' %}
               <form method="post" action="{% url 'rentals:booking_set_status' b.id 'cancel' %}">
                 {% csrf_token %}
@@ -110,7 +108,7 @@
               <form method="post" action="{% url 'rentals:booking_set_status' b.id 'no_show' %}">
                 {% csrf_token %}
                 <input type="hidden" name="status_filter" value="{{ status|default:'' }}">
-                <button class="btn small warn" title="Σήμανση ως no-show (cancelled)">No‑Show</button>
+                <button class="btn small warn" title="Σήμανση ως no-show (cancelled)">No-Show</button>
               </form>
               {% endif %}
             </div>

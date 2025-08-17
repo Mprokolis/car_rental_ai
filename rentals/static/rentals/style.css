@@ -1,0 +1,153 @@
+/* Light theme (default) */
+:root {
+    --bg-color: #e0f7fa;
+    --gradient-end: #fce4ec;
+    --text-color: #333;
+    --container-bg: #ffffff;
+    --heading-color: #34495e;
+    --link-color: #6a1b9a;
+    --link-hover: underline;
+    --button-bg: #2c7be5;
+    --button-hover: #1a5bb8;
+    --button-text: white;
+    --card-bg: #f9f9f9;
+    --card-border: #ddd;
+    --li-hover: #f1f8ff;
+    --delete-bg: #e74c3c;
+    --delete-hover: #c0392b;
+    --logout-bg: #3498db;
+    --logout-hover: #2c80b4;
+}
+
+/* Dark theme */
+body.dark {
+    --bg-color: #121212;
+    --gradient-end: #1f1f1f;
+    --text-color: #f5f5f5;
+    --container-bg: #1e1e1e;
+    --heading-color: #dcdcdc;
+    --link-color: #bb86fc;
+    --button-bg: #3b82f6;
+    --button-hover: #2563eb;
+    --button-text: #ffffff;
+    --card-bg: #2a2a2a;
+    --card-border: #444;
+    --li-hover: #2c2c2c;
+    --delete-bg: #e53935;
+    --delete-hover: #c62828;
+    --logout-bg: #2196f3;
+    --logout-hover: #1976d2;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, var(--bg-color), var(--gradient-end));
+    color: var(--text-color);
+    margin: 0;
+    padding: 2rem;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+.container {
+    background-color: var(--container-bg);
+    padding: 1.5rem 2rem;
+    border-radius: 16px;
+    max-width: 900px;
+    margin: auto;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.container:hover { transform: scale(1.005); }
+
+h1, h2 {
+    color: var(--heading-color);
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+h1::before { content: "🚗 "; }
+h2::before { content: "🟢 "; }
+
+form { margin-bottom: 1.5rem; }
+
+/* ------------------------------------------------- */
+/* Buttons (γενικά)                                  */
+/* ------------------------------------------------- */
+button, .btn {
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    border: none;
+    padding: 0.4rem 0.8rem;   /* πιο μικρό */
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;        /* πιο μικρό */
+    transition: background 0.3s ease, transform 0.2s;
+    box-shadow: 0 4px 6px rgba(44, 123, 229, 0.3);
+}
+button:hover, .btn:hover {
+    background-color: var(--button-hover);
+    transform: scale(1.03);
+}
+
+a { color: var(--link-color); text-decoration: none; font-weight: bold; }
+a:hover { text-decoration: var(--link-hover); }
+
+ul { list-style: none; padding: 0; }
+
+/* ------------------------------------------------- */
+/* Λίστα αυτοκινήτων: κείμενο αριστερά, κουμπί δεξιά */
+/* ------------------------------------------------- */
+.car-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* σπρώχνει το κουμπί δεξιά */
+    gap: 12px;                       /* απόσταση μεταξύ κειμένου-κουμπιού */
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--card-border);
+    transition: background-color 0.3s ease;
+}
+.car-list li:hover { background-color: var(--li-hover); }
+
+/* Το συγκεκριμένο κουμπί να μην τυλίγεται/να μην μεγαλώνει */
+.car-list .btn {
+    flex-shrink: 0;         /* να μην μικραίνει το button */
+    white-space: nowrap;    /* να μη σπάει σε 2 γραμμές */
+    min-width: 112px;       /* σταθερό, μικρό πλάτος */
+    text-align: center;
+    margin-left: 10px;      /* “ανάσα” από το κείμενο */
+}
+
+/* Προαιρετικό: ένδειξη κατάταξης */
+.rank { font-weight: 600; margin-right: 8px; opacity: 0.7; }
+
+.car-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+}
+.car-card {
+    background-color: var(--card-bg);
+    padding: 1rem;
+    border-radius: 12px;
+    border: 1px solid var(--card-border);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.car-card:hover { transform: translateY(-5px); box-shadow: 0 6px 16px rgba(0,0,0,0.1); }
+
+.status { font-weight: bold; color: #e74c3c; }
+.back-link { margin-top: 2rem; text-align: center; }
+
+.delete-btn {
+    background-color: var(--delete-bg);
+    margin-left: 0.5rem;
+    box-shadow: 0 3px 6px rgba(231, 76, 60, 0.3);
+}
+.delete-btn:hover { background-color: var(--delete-hover); }
+
+.logout-container { position: absolute; top: 20px; right: 20px; }
+.logout-container form { margin: 0; display: inline; }
+.logout-container button { background-color: var(--logout-bg); padding: 0.4rem 1rem; font-size: 0.9rem; }
+.logout-container button:hover { background-color: var(--logout-hover); }
+
+.columns { display: flex; gap: 30px; margin-top: 2rem; }
+.column { flex: 1; }
