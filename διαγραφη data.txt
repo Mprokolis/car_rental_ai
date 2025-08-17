@@ -1,5 +1,8 @@
--------------------------------------------------------------------.
+-------------------------διαγραφη------------------------------------------
+
 python manage.py shell
+
+
 
 from recommendations.models import RentalRequest, RentalDecision
 
@@ -7,4 +10,13 @@ RentalDecision.objects.all().delete()
 RentalRequest.objects.all().delete()
 
 print("✔ Διαγράφηκαν όλα τα training data.")
+
+-------------------------------------------------------------------
+
+-------------------------train------------------------------------------
+
+python manage.py safe_retrain_all
+
+python manage.py train_model <company_username>
+
 -------------------------------------------------------------------

@@ -33,8 +33,31 @@ def convert_bookings_to_rental_requests(modeladmin, request, queryset):
 
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
-    list_display = ('id', 'company', 'customer_name', 'start_date', 'end_date',
-                    'status', 'requested_category', 'extra_insurance', 'total_price')
-    list_filter = ('company', 'status', 'requested_category', 'extra_insurance', 'start_date')
-    search_fields = ('customer_name', 'customer_email', 'customer_phone', 'source_email_uid', 'gm_msgid')
+    list_display = (
+        'id',
+        'booking_code',
+        'company',
+        'customer_name',
+        'start_at',
+        'end_at',
+        'status',
+        'requested_category',
+        'extra_insurance',
+        'total_price',
+    )
+    list_filter = (
+        'company',
+        'status',
+        'requested_category',
+        'extra_insurance',
+        'start_at',
+    )
+    search_fields = (
+        'booking_code',
+        'customer_name',
+        'customer_email',
+        'customer_phone',
+        'source_email_uid',
+        'gm_msgid',
+    )
     actions = [convert_bookings_to_rental_requests]

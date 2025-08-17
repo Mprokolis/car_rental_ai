@@ -178,9 +178,9 @@ class Command(BaseCommand):
         imported, skipped, converted, errors = 0, 0, 0, 0
 
         for uid in uids:
-            try:
-                uid_str = uid.decode() if isinstance(uid, bytes) else str(uid)
+            uid_str = uid.decode() if isinstance(uid, bytes) else str(uid)
 
+            try:
                 gm_msgid = _extract_x_gm_msgid(M, uid_str)
 
                 qs = Booking.objects.filter(company=company)
@@ -206,16 +206,7 @@ class Command(BaseCommand):
 
                 from_hdr = _decode(msg.get("From", ""))
                 # extra έλεγχος αποστολέα, αν δόθηκε
-                if sender and sender.lower() not in from_hdr.lower():
-                    # Αν θες να παραλείπονται όσα δεν ταιριάζουν στον αποστολέα, ξε-σχολίασε:
-                    # skipped += 1
-                    # continue
-                    pass
-
-                pdf_found = False
-                pdf_rel_path = ""
-                parsed = {}
-
+@@ -219,52 +219,53 @@ class Command(BaseCommand):
                 for part in msg.walk():
                     if part.get_content_maintype() == "multipart":
                         continue
@@ -241,8 +232,9 @@ class Command(BaseCommand):
                     customer_name=parsed.get("customer_name", "") or "",
                     customer_email=parsed.get("customer_email", "") or "",
                     customer_phone=parsed.get("customer_phone", "") or "",
-                    start_date=parsed.get("start_date"),
-                    end_date=parsed.get("end_date"),
+                    booking_code=parsed.get("booking_code", "") or "",
+                    start_at=parsed.get("start_at"),
+                    end_at=parsed.get("end_at"),
                     total_price=parsed.get("total_price"),
                     requested_category=parsed.get("requested_category", "") or "",
                     extra_insurance=bool(parsed.get("extra_insurance", False)),
@@ -268,12 +260,3 @@ class Command(BaseCommand):
                         M.uid("store", uid_str, "+FLAGS", "(\\Seen)")
                     except Exception:
                         pass
-
-            except Exception:
-                errors += 1
-                traceback.print_exc(file=sys.stderr)
-                continue
-
-        M.logout()
-        msg = f"OK — Imported: {imported}, Skipped: {skipped}, Converted: {converted}, Errors: {errors}"
-        self.stdout.write(self.style.SUCCESS(msg))
