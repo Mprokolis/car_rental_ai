@@ -49,14 +49,11 @@
     <table>
       <thead>
         <tr>
-          <th>#</th>
-          <th>Δημιουργήθηκε</th>
+          <th>Ημερομηνίες</th>
           <th>Πελάτης</th>
           <th>Κατηγορία</th>
-          <th>Από</th>
-          <th>Έως</th>
-          <th>Ημέρες</th>
-          <th>Σύνολο</th>
+          <th>Κωδικός</th>
+          <th>Τηλέφωνο</th>
           <th>Status</th>
           <th>Ενέργειες</th>
         </tr>
@@ -64,14 +61,15 @@
       <tbody>
         {% for b in bookings %}
         <tr>
-          <td>{{ b.id }}</td>
-          <td>{{ b.created_at|date:"d-m-Y H:i" }}</td>
+          <td>
+            {% if b.start_date %}{{ b.start_date|date:"d-m-Y" }}{% else %}—{% endif %}
+            –
+            {% if b.end_date %}{{ b.end_date|date:"d-m-Y" }}{% else %}—{% endif %}
+          </td>
           <td>{{ b.customer_name|default:"—" }}</td>
           <td>{{ b.requested_category|default:"—" }}</td>
-          <td>{% if b.start_date %}{{ b.start_date|date:"d-m-Y" }}{% else %}—{% endif %}</td>
-          <td>{% if b.end_date %}{{ b.end_date|date:"d-m-Y" }}{% else %}—{% endif %}</td>
-          <td>{{ b.days }}</td>
-          <td>{% if b.total_price %}€{{ b.total_price }}{% else %}—{% endif %}</td>
+          <td>{{ b.booking_code|default:"—" }}</td>
+          <td>{{ b.customer_phone|default:"—" }}</td>
           <td><span class="badge b-{{ b.status }}">{{ b.status }}</span></td>
           <td>
             <div class="actions">
@@ -105,7 +103,7 @@
           </td>
         </tr>
         {% empty %}
-        <tr><td colspan="10" class="empty">Δεν υπάρχουν κρατήσεις.</td></tr>
+        <tr><td colspan="7" class="empty">Δεν υπάρχουν κρατήσεις.</td></tr>
         {% endfor %}
       </tbody>
     </table>
