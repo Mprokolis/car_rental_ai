@@ -1,0 +1,132 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8" />
+  <title>Bookings</title>
+  <link rel="stylesheet" href="{% static 'rentals/style.css' %}">
+  <style>
+    .wrap { max-width: 1100px; margin: 2rem auto; }
+    .topbar { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:1rem; }
+    .btn { padding:.5rem .8rem; border-radius:8px; border:1px solid var(--card-border,#e5e7eb); background:var(--container-bg,#fff); cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:.4rem; }
+    .btn.primary { background:#2563eb; color:#fff; border-color:#2563eb; }
+    .btn.danger { background:#fee2e2; border-color:#fecaca; }
+    .btn.success { background:#dcfce7; border-color:#bbf7d0; }
+    .btn.warn { background:#fde68a; border-color:#fcd34d; }
+    .btn.small { padding:.35rem .6rem; font-size:.9rem; }
+    .filters { display:flex; align-items:center; gap:.5rem; }
+    table { width:100%; border-collapse: collapse; border-radius:12px; overflow:hidden; }
+    thead th { background:#f3f4f6; text-align:left; padding:.7rem .6rem; font-weight:600; }
+    tbody td { padding:.65rem .6rem; border-bottom:1px solid #eee; vertical-align: middle; }
+    .actions { display:flex; gap:.4rem; flex-wrap:wrap; }
+    .badge { display:inline-block; padding:.2rem .55rem; border-radius:999px; font-size:.8rem; }
+    .b-imported { background:#dbeafe; }
+    .b-active { background:#dcfce7; }
+    .b-completed { background:#e5e7eb; }
+    .b-cancelled { background:#fee2e2; }
+    .msgs { margin:.5rem 0 1rem; }
+    .msgs li { list-style:none; padding:.4rem .6rem; margin:.2rem 0; border-radius:6px; background:#eef2ff; }
+    .empty { padding:1rem; text-align:center; color:#666; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <h1>🚐 Bookings{% if status %} — {{ status|title }}{% endif %}</h1>
+      <div class="filters">
+        <a class="btn" href="{% url 'rentals:select_car' %}">← Πίσω</a>
+        <form method="get">
+          <label>Φίλτρο status:</label>
+          <select name="status" onchange="this.form.submit()">
+            <option value="">(Όλα)</option>
+            <option value="imported"  {% if status == 'imported' %}selected{% endif %}>imported</option>
+            <option value="active"    {% if status == 'active' %}selected{% endif %}>active</option>
+            <option value="completed" {% if status == 'completed' %}selected{% endif %}>completed</option>
+            <option value="cancelled" {% if status == 'cancelled' %}selected{% endif %}>cancelled</option>
+          </select>
+        </form>
+      </div>
+    </div>
+
+    {% if messages %}
+      <ul class="msgs">
+        {% for message in messages %}
+          <li class="{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Ημ/νία</th>
+          <th>Πελάτης</th>
+          <th>Κατηγορία</th>
+          <th>Από</th>
+          <th>Έως</th>
+          <th>Ημέρες</th>
+          <th>Σύνολο</th>
+          <th>Status</th>
+          <th>Ενέργειες</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for b in bookings %}
+        <tr>
+          <td>{{ b.id }}</td>
+          <td>{{ b.created_at|date:"d-m-Y H:i" }}</td>
+          <td>{{ b.customer_name }}</td>
+          <td>{{ b.requested_category }}</td>
+          <td>{% if b.start_date %}{{ b.start_date|date:"d-m-Y" }}{% endif %}</td>
+          <td>{% if b.end_date %}{{ b.end_date|date:"d-m-Y" }}{% endif %}</td>
+          <td>{{ b.days }}</td>
+          <td>{% if b.total_price %}€{{ b.total_price }}{% endif %}</td>
+          <td>
+            <span class="badge b-{{ b.status }}">{{ b.status }}</span>
+          </td>
+          <td>
+            <div class="actions">
+              {% if b.status != 'active' and b.status != 'completed' %}
+              <form method="post" action="{% url 'rentals:booking_set_status' b.id 'activate' %}">
+                {% csrf_token %}
+                <input type="hidden" name="status_filter" value="{{ status|default:'' }}">
+                <button class="btn small" title="Σήμανση ως active">Ενεργοποίηση</button>
+              </form>
+              {% endif %}
+
+              {% if b.status != 'completed' %}
+              <form method="post" action="{% url 'rentals:booking_set_status' b.id 'complete' %}">
+                {% csrf_token %}
+                <input type="hidden" name="status_filter" value="{{ status|default:'' }}">
+                <button class="btn small success" title="Σήμανση ως completed">Ολοκλήρωση</button>
+              </form>
+              {% endif %}
+
+              {% if b.status != 'cancelled' and b.status != 'completed' %}
+              <form method="post" action="{% url 'rentals:booking_set_status' b.id 'cancel' %}">
+                {% csrf_token %}
+                <input type="hidden" name="status_filter" value="{{ status|default:'' }}">
+                <button class="btn small danger" title="Σήμανση ως cancelled">Ακύρωση</button>
+              </form>
+              <form method="post" action="{% url 'rentals:booking_set_status' b.id 'no_show' %}">
+                {% csrf_token %}
+                <input type="hidden" name="status_filter" value="{{ status|default:'' }}">
+                <button class="btn small warn" title="Σήμανση ως no-show (cancelled)">No‑Show</button>
+              </form>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="10" class="empty">Δεν υπάρχουν κρατήσεις.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <p style="margin-top:1rem;">
+      Tip: Για μετατροπή σε RentalRequest μαζικά → κάν’το από το <strong>Admin</strong> (action).
+    </p>
+  </div>
+</body>
+</html>

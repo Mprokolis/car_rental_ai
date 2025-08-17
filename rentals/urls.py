@@ -13,6 +13,8 @@ from .views import (
     fleet_status,
     return_car,
     delete_cars_view,
+    bookings_list,
+    booking_set_status,
 )
 
 app_name = "rentals"
@@ -66,4 +68,8 @@ urlpatterns: list[path] = [
     path("choose-car/<int:request_id>/<int:car_id>/", choose_car, name="choose_car"),
     path("fleet/", fleet_status, name="fleet_status"),
     path("return-car/<int:car_id>/", return_car, name="return_car"),
+
+    # Bookings
+    path("bookings/", bookings_list, name="bookings_list"),
+    path("bookings/<int:booking_id>/<str:action>/", booking_set_status, name="booking_set_status"),
 ]

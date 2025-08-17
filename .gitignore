@@ -1,46 +1,46 @@
-# --- Python/Django ---
+# --- Python ---
 __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
 *.so
 *.egg-info/
-*.log
-*.sqlite3
-db.sqlite3
-.env
-.env.* 
-.venv/
-venv/
 pip-wheel-metadata/
 
-# Django collectstatic / media
-staticfiles/
-static/
-media/
+# --- Django ---
+*.log
+db.sqlite3
+*.sqlite3
+.env
+.env.*
+.venv/
+venv/
 logs/
 tmp/
 tmp_imports/
-reservations_inbox/
 
-# Project-specific
+# Django collectstatic / user media
+staticfiles/
+static/
+media/
+
+# --- Project-specific ---
 owa_profile/
 model_company_*.joblib
+reservations_inbox/
+reservations_inbox/**/*.pdf
 
-# Tests / tools
+# --- Tests / Coverage ---
 .pytest_cache/
 .coverage
 htmlcov/
 
-# Editors/IDE
+# --- Editors / IDE ---
 .vscode/
 .idea/
 *.code-workspace
 .DS_Store
 Thumbs.db
 
-# Node/Front-end (αν υπάρξει)
+# --- Node / Frontend (αν χρειαστεί) ---
 node_modules/
-
-# PDFs μόνο από τον φάκελο εισαγωγών
-reservations_inbox/**/*.pdf

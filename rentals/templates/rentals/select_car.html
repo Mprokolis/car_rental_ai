@@ -74,9 +74,13 @@
             <a class="btn secondary" href="{% url 'rentals:delete_cars' %}">
                 <i class="fas fa-trash"></i> Διαγραφή Οχημάτων
             </a>
+            <!-- ✅ ΝΕΟ κουμπί -->
+            <a class="btn secondary" href="{% url 'rentals:bookings_list' %}">
+                <i class="fas fa-file-invoice"></i> Κρατήσεις
+            </a>
         </div>
 
-        <!-- ✅ Προσθήκη: Μετρητές πάνω από "Διαθέσιμα Αυτοκίνητα" -->
+        <!-- ✅ Μετρητές -->
         <div class="counts-summary">
             Διαθέσιμα: <strong>{{ available_cars|length }}</strong>
             <span class="dot">•</span>

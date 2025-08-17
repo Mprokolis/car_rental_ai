@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, redirect, render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotAllowed
 from django.core.mail import send_mail
 
 from .forms import (
@@ -12,7 +12,7 @@ from .forms import (
     CompanyLoginForm,
     CompanyRegistrationForm,
 )
-from .models import Car, Company
+from .models import Car, Company, Booking
 from .utils import rank_cars
 from recommendations.models import RentalDecision, RentalRequest
 
@@ -238,3 +238,45 @@ def test_email(request):
     return HttpResponse("✅ Το email στάλθηκε!")
 
 
+# ---------------- Λίστα κρατήσεων ----------------
+
+@login_required
+def bookings_list(request):
+    company = get_object_or_404(Company, user=request.user)
+    q = Booking.objects.filter(company=company).order_by("-created_at")
+    status = request.GET.get("status")
+    if status:
+        q = q.filter(status=status)
+    return render(request, "rentals/bookings_list.html", {"bookings": q, "status": status})
+
+
+@login_required
+def booking_set_status(request, booking_id: int, action: str):
+    """Αλλάζει status κράτησης με ασφάλεια. Επιτρεπτά actions: activate, complete, cancel, no_show."""
+    if request.method != "POST":
+        return HttpResponseNotAllowed(["POST"])
+
+    company = get_object_or_404(Company, user=request.user)
+    booking = get_object_or_404(Booking, id=booking_id, company=company)
+
+    mapping = {
+        "activate": "active",
+        "complete": "completed",
+        "cancel": "cancelled",
+        "no_show": "cancelled",  # προς το παρόν το μετράμε ως cancelled
+    }
+    if action not in mapping:
+        messages.error(request, "Μη έγκυρη ενέργεια.")
+    else:
+        new_status = mapping[action]
+        if booking.status != new_status:
+            booking.status = new_status
+            booking.save(update_fields=["status"])
+        label = "No‑Show" if action == "no_show" else new_status
+        messages.success(request, f"Η κράτηση #{booking.id} σημάνθηκε ως {label}.")
+
+    # Επιστροφή στη λίστα, διατηρώντας το φίλτρο
+    status_filter = request.POST.get("status_filter", "")
+    if status_filter:
+        return redirect(f"/rentals/bookings/?status={status_filter}")
+    return redirect("rentals:bookings_list")
