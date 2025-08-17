@@ -38,8 +38,8 @@ class BookingAdmin(admin.ModelAdmin):
         'booking_code',
         'company',
         'customer_name',
-        'start_at',
-        'end_at',
+        'start_date',
+        'end_date',
         'status',
         'requested_category',
         'extra_insurance',
@@ -50,7 +50,7 @@ class BookingAdmin(admin.ModelAdmin):
         'status',
         'requested_category',
         'extra_insurance',
-        'start_at',
+        'start_date',
     )
     search_fields = (
         'booking_code',
