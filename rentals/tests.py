@@ -7,6 +7,7 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from .models import Company, Booking
+from .utils_email import parse_booking_text
 
 
 class PasswordResetFlowTests(TestCase):
@@ -73,3 +74,20 @@ class BookingViewsTests(TestCase):
         self.assertRedirects(resp, reverse('rentals:bookings_list'))
         self.booking.refresh_from_db()
         self.assertEqual(self.booking.status, 'active')
+
+
+class EmailParsingTests(TestCase):
+    def test_parse_booking_text_from_body(self):
+        sample = (
+            "Name: Luciano Pasquali\n"
+            "Phone Number: 2101234567\n"
+            "Vehicle Class: ECMD\n"
+            "Pick up Location: Heraklion\nDate: 18/08/2025 14:00\n"
+            "Return Location: Heraklion\nDate: 29/08/2025 10:30\n"
+        )
+        data = parse_booking_text(sample)
+        self.assertEqual(data["customer_name"], "Luciano Pasquali")
+        self.assertEqual(data["customer_phone"], "2101234567")
+        self.assertEqual(data["requested_category"], "ecmd")
+        self.assertEqual(str(data["start_date"]), "2025-08-18")
+        self.assertEqual(str(data["end_date"]), "2025-08-29")

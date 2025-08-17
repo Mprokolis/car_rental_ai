@@ -207,6 +207,10 @@ class Command(BaseCommand):
                 from_hdr = _decode(msg.get("From", ""))
                 # extra έλεγχος αποστολέα, αν δόθηκε
 @@ -219,52 +219,53 @@ class Command(BaseCommand):
+                body_text = ""
+                parsed = {}
+                pdf_rel_path = ""
+                pdf_found = False
                 for part in msg.walk():
                     if part.get_content_maintype() == "multipart":
                         continue
@@ -222,10 +226,21 @@ class Command(BaseCommand):
                         pdf_found = True
                         parsed = _parse_pdf_bytes(payload)
                         break
+                    elif ctype in ("text/plain", "text/html") and not body_text:
+                        payload = part.get_payload(decode=True) or b""
+                        try:
+                            body_text = payload.decode(part.get_content_charset() or "utf-8", errors="ignore")
+                        except Exception:
+                            body_text = payload.decode("utf-8", errors="ignore")
+                        if ctype == "text/html":
+                            body_text = re.sub(r"<[^>]+>", " ", body_text)
 
                 if not pdf_found:
-                    skipped += 1
-                    continue
+                    if body_text:
+                        parsed = parse_booking_text(body_text)
+                    else:
+                        skipped += 1
+                        continue
 
                 booking = Booking.objects.create(
                     company=company,
