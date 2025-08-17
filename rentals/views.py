@@ -243,7 +243,7 @@ def test_email(request):
 @login_required
 def bookings_list(request):
     company = get_object_or_404(Company, user=request.user)
-    q = Booking.objects.filter(company=company).order_by("-created_at")
+    q = Booking.objects.filter(company=company).order_by("start_date")
     status = request.GET.get("status")
     if status:
         q = q.filter(status=status)

@@ -75,6 +75,7 @@ class Booking(models.Model):
     customer_name = models.CharField(max_length=120, blank=True)
     customer_email = models.EmailField(blank=True)
     customer_phone = models.CharField(max_length=50, blank=True)
+    booking_code = models.CharField(max_length=20, blank=True)
 
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
@@ -94,6 +95,13 @@ class Booking(models.Model):
 
     def __str__(self):
         return f"Booking #{self.id} ({self.status})"
+
+    def save(self, *args, **kwargs):
+        creating = self.pk is None
+        super().save(*args, **kwargs)
+        if creating and not self.booking_code:
+            self.booking_code = f"G5{self.id}"
+            super().save(update_fields=["booking_code"])
 
     @property
     def days(self) -> int:
