@@ -232,7 +232,7 @@ class Command(BaseCommand):
                     customer_name=parsed.get("customer_name", "") or "",
                     customer_email=parsed.get("customer_email", "") or "",
                     customer_phone=parsed.get("customer_phone", "") or "",
-                    booking_code=parsed.get("booking_code", "") or "",
+                    booking_code=parsed.get("booking_code") or None,
                     start_date=parsed.get("start_date"),
                     end_date=parsed.get("end_date"),
                     total_price=parsed.get("total_price"),

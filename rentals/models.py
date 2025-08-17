@@ -79,6 +79,7 @@ class Booking(models.Model):
     booking_code = models.CharField(
         max_length=20,
         blank=True,
+        null=True,
         unique=True,
         db_index=True,
     )
